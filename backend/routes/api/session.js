@@ -1,14 +1,15 @@
+// backend/routes/api/session.js
 const express = require('express')
 const { Op } = require('sequelize');
 const bcrypt = require('bcryptjs');
 const { check } = require('express-validator');
 const { handleValidationErrors } = require('../../utils/validation');
 
-//not sure if this is supposed to go under the chunk
-const router = express.Router();
 
 const { setTokenCookie, restoreUser } = require('../../utils/auth');
 const { User } = require('../../db/models');
+
+const router = express.Router();
 
 const validateLogin = [
     check('credential')
@@ -21,7 +22,28 @@ const validateLogin = [
     handleValidationErrors
   ];
 
+// Restore session user
+router.get(
+    '/',
+    (req, res) => {
+      const { user } = req;
+      if (user) {
+        const safeUser = {
+          id: user.id,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          username: user.username,
+        };
+        return res.json({
+          user: safeUser
+        });
+      } else return res.json({ user: null });
+    }
+  );
 
+  
+// Log in
 router.post(
     '/',
     validateLogin,
@@ -59,29 +81,14 @@ router.post(
     }
   );
 
-  router.delete(
+
+// Log out
+router.delete(
     '/',
     (_req, res) => {
       res.clearCookie('token');
       return res.json({ message: 'success' });
     }
   );
-  
-  router.get(
-    '/',
-    (req, res) => {
-      const { user } = req;
-      if (user) {
-        const safeUser = {
-          id: user.id,
-          email: user.email,
-          username: user.username,
-        };
-        return res.json({
-          user: safeUser
-        });
-      } else return res.json({ user: null });
-    }
-  );
-//here
+
 module.exports = router;
