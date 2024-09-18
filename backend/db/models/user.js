@@ -40,6 +40,16 @@ module.exports = (sequelize, DataTypes) => {
           len: [60, 60],
         },
       },
+      firstName: {   //added firstName (9/17)
+        type: DataTypes.STRING(50),
+        allowNull:false,
+        
+      }, 
+      lastName: { //added lastName (9/17)
+        type: DataTypes.STRING(50),
+        allowNull:false,
+
+      }
     },
     {
       sequelize,
