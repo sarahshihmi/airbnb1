@@ -41,12 +41,22 @@ module.exports = {
           allowNull: false,
         },
         lat: {
-          type: Sequelize.NUMERIC,
+          type: Sequelize.FLOAT(7, 5),
           allowNull: false,
+          validate: {
+            isFloat: true,
+            min: 0,
+            max: 90
+          }
         },
         lng: {
-          type: Sequelize.NUMERIC,
+          type: Sequelize.FLOAT(7, 5),
           allowNull: false,
+          validate: {
+            isFloat: true,
+            min: 0,
+            max: 180
+          }
         },
         name: {
           type: Sequelize.STRING,
@@ -57,7 +67,7 @@ module.exports = {
           allowNull: false,
         },
         price: {
-          type: Sequelize.NUMERIC,
+          type: Sequelize.DECIMAL(8, 2),
           allowNull: false,
         },
         createdAt: {
