@@ -24,10 +24,24 @@ module.exports = (sequelize, DataTypes) => {
     startDate: {
       type: DataTypes.DATE,
       allowNull: false,
+      validate: {
+        pastDate(value){
+          const currentDate = new Date()
+          currentDate.setHours(0,0,0,0)
+
+          if (new Date(value) < currentDate) {
+            throw new Error('Start date cannot be in the past.');
+          }
+         
+        }
+      }
     },
     endDate: {
       type: DataTypes.DATE,
       allowNull: false,
+      validate(value) {
+        if (value <= this.startDate) throw new Error ('The end date can not be before or on the start date')
+      }
     }
   }, {
     sequelize,
