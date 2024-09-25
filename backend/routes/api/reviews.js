@@ -76,9 +76,10 @@ router.put('/:reviewId', requireAuth, async(res, req) => {
     await review.save();
   
     res.json(review);
+})
   
 router.delete('/:reviewId', requireAuth, async(res, req)=> {
-    const { reviewId } = req.params;
+    const reviewId = req.params;
     const userId = req.user.id;
     const review = await Review.findByPk(reviewId);
 
@@ -97,5 +98,5 @@ router.delete('/:reviewId', requireAuth, async(res, req)=> {
         message: "Sucessfully deleted"
     })
 })
-})
+
 module.exports = router;
