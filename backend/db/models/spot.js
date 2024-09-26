@@ -1,4 +1,5 @@
 'use strict';
+const { Sequelize } = require('sequelize')
 const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class Spot extends Model {
@@ -8,11 +9,25 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      Spot.belongsTo(models.User, { foreignKey: 'ownerId' });
+      Spot.belongsTo(models.User, {as: 'Owner', foreignKey: 'ownerId' });
       Spot.hasMany(models.Booking, { foreignKey: 'spotId' });
       Spot.hasMany(models.Review, { foreignKey: 'spotId' });
       Spot.hasMany(models.SpotImage, { foreignKey: 'spotId' });
     }
+    // async numRev() {
+    //   const { Review } = sequelize.models;
+
+    //   const stats = await Review.findAll({
+    //     where: {spotId: this.id},
+    //     attributes: [
+    //       [Sequelize.fn('COUNT', Sequelize.col('Review.id')), 'numReviews'],
+    //       [Sequelize.fn('AVG', Sequelize.col('Review.stars')), 'avgStarRating']
+    //     ]
+    //   })
+    //   return {numReviews: stats.numReviews, avgStarRating: stats.avgStarRating}
+    // }
+
+
   }
   Spot.init(
     {
@@ -144,6 +159,39 @@ module.exports = (sequelize, DataTypes) => {
     {
       sequelize,
       modelName: 'Spot',
+      scopes: {
+        withDetails: {
+          attributes: {
+            include: [
+              [
+                Sequelize.fn('COUNT', Sequelize.col('Reviews.id')),
+                'numReviews',
+              ],
+              [
+                Sequelize.fn('AVG', Sequelize.col('Reviews.stars')),
+                'avgStarRating',
+              ],
+            ],
+          },
+          include: [
+            {
+              model: sequelize.models.Review,
+              attributes: [],
+            },
+            {
+              model: sequelize.models.SpotImage,
+              attributes: ['id', 'url', 'preview'],
+            },
+            {
+              model: sequelize.models.User,
+              as: 'Owner',
+              attributes: ['id', 'firstName', 'lastName'],
+            },
+          ],
+          group: ['Spot.id', 'SpotImages.id', 'Owner.id'],
+          subQuery: false,
+        },
+      }
     }
   );
   return Spot;
