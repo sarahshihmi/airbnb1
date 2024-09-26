@@ -3,6 +3,7 @@
 const { describe } = require('mocha');
 const { Spot } = require('../models')
 const bcrypt = require('bcryptjs');
+const { Op } = require('sequelize');
 
 let options = {};
 if (process.env.NODE_ENV === 'production') {
@@ -23,6 +24,7 @@ module.exports = {
         name: 'Purple Palace',
         description: 'High end luxury living',
         price: 3200.23,
+        ownerId: 1
       },
       { 
         address: '223 Oriental Avenue',
@@ -33,7 +35,8 @@ module.exports = {
         lng: 23.7822,
         name: 'Orange Home',
         description: 'affordable fun for the family',
-        price: 200.50
+        price: 200.50,
+        ownerId: 2
       },
       {
         address: '715 Marvin Gardens',
@@ -44,13 +47,14 @@ module.exports = {
         lng: 23.78333,
         name: 'Yellow Yard',
         description: 'Higher end location',
-        price: 800.00
+        price: 800.00,
+        ownerId: 3
       }
     ], { validate: true})
   },
 
   async down (queryInterface, Sequelize) {
-    options.tableName = 'Spot';
+    options.tableName = 'Spots';
     return queryInterface.bulkDelete(options, {
       name: { [Op.in]: ['Purple Palace', 'Orange Home', 'Yellow Yard'] }
     }, {})

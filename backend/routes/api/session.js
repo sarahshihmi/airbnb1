@@ -40,7 +40,7 @@ router.get(
         });
       } else return res.json({ user: null });
     }
-  );
+);
 
   
 // Log in
@@ -69,6 +69,8 @@ router.post(
   
       const safeUser = {
         id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
         email: user.email,
         username: user.username,
         firstName: user.firstName,  

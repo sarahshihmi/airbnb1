@@ -16,14 +16,6 @@ module.exports = {
           primaryKey: true,
           type: Sequelize.INTEGER,
         },
-        ownerId: {
-          type: Sequelize.INTEGER,
-          references: {
-            model: 'Users',
-          },
-          onDelete: 'CASCADE',
-          onUpdate: 'CASCADE'
-        },
         address: {
           type: Sequelize.STRING,
           allowNull: false,
@@ -80,6 +72,16 @@ module.exports = {
           type: Sequelize.DATE,
           defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
         },
+        ownerId: {
+          allowNull: false,
+          type: Sequelize.INTEGER,
+          references: {
+            model: 'Users',
+            key: 'id'
+          },
+          onDelete: 'CASCADE',
+          onUpdate: 'CASCADE'
+        }
       },
       options,
     );
