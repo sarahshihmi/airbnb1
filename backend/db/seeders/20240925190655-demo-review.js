@@ -19,12 +19,6 @@ module.exports = {
       },
       {
         spotId: 1,
-        userId: 2,
-        review: 'another great visit',
-        stars: 5
-      },
-      {
-        spotId: 1,
         userId: 3,
         review: 'a bit over priced',
         stars: 2
@@ -37,12 +31,6 @@ module.exports = {
       },
       {
         spotId: 2,
-        userId: 3,
-        review: 'came back and been some renovations',
-        stars: 4
-      },
-      {
-        spotId: 2,
         userId: 1,
         review: 'not too shabby',
         stars: 3
@@ -52,12 +40,6 @@ module.exports = {
         userId: 1,
         review: 'you get what you pay for',
         stars: 4
-      },
-      {
-        spotId: 3,
-        userId: 1,
-        review: 'really enjoyed my first stay and came back',
-        stars: 5
       },
       {
         spotId: 3,

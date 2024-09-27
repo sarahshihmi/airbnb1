@@ -1,6 +1,7 @@
 'use strict';
 const { Sequelize } = require('sequelize')
 const { Model } = require('sequelize');
+const { SpotImage } = require('./spotimage')
 module.exports = (sequelize, DataTypes) => {
   class Spot extends Model {
     /**
@@ -13,7 +14,39 @@ module.exports = (sequelize, DataTypes) => {
       Spot.hasMany(models.Booking, { foreignKey: 'spotId' });
       Spot.hasMany(models.Review, { foreignKey: 'spotId' });
       Spot.hasMany(models.SpotImage, { foreignKey: 'spotId' });
-    }
+
+      Spot.addScope('addAllImages', {
+        include: [
+                {
+                  model: models.SpotImage,
+                  attributes: ["id", "url", "preview"]
+                }
+            ]
+      })
+
+      Spot.addScope('addOwner', {
+         include: [
+            {
+              model: sequelize.models.User,
+              as: 'Owner',
+              attributes: ['id', 'firstName', 'lastName']
+            }
+          ]
+      });
+
+      // Spot.addScope('addPreview', {
+      //   attributes: {
+      //     include: [
+      //       [Sequelize.literal(`(SELECT "url"
+      //                             FROM SpotImages as images
+      //                             WHERE
+      //                               images.preview = true)`),
+      //                             'previewImage',
+      //                           ]
+      //     ]
+      //   }
+      // })
+    };
     // async numRev() {
     //   const { Review } = sequelize.models;
 
@@ -27,8 +60,10 @@ module.exports = (sequelize, DataTypes) => {
     //   return {numReviews: stats.numReviews, avgStarRating: stats.avgStarRating}
     // }
 
+    
 
-  }
+
+}
   Spot.init(
     {
       address: {
@@ -160,7 +195,8 @@ module.exports = (sequelize, DataTypes) => {
       sequelize,
       modelName: 'Spot',
       scopes: {
-        withDetails: {
+
+        addRatings: {
           attributes: {
             include: [
               [
@@ -169,7 +205,7 @@ module.exports = (sequelize, DataTypes) => {
               ],
               [
                 Sequelize.fn('AVG', Sequelize.col('Reviews.stars')),
-                'avgStarRating',
+                'avgRating',
               ],
             ],
           },
@@ -178,18 +214,21 @@ module.exports = (sequelize, DataTypes) => {
               model: sequelize.models.Review,
               attributes: [],
             },
-            {
-              model: sequelize.models.SpotImage,
-              attributes: ['id', 'url', 'preview'],
-            },
-            {
-              model: sequelize.models.User,
-              as: 'Owner',
-              attributes: ['id', 'firstName', 'lastName'],
-            },
           ],
-          group: ['Spot.id', 'SpotImages.id', 'Owner.id'],
-          subQuery: false,
+          group: ['Spot.id']
+        }, 
+
+        addPreview: {
+          attributes: {
+            include: [
+              [Sequelize.literal(`(SELECT "url"
+                        FROM SpotImages AS image
+                        WHERE
+                            image.preview = true)`),
+                            'previewImage',
+              ],
+            ]
+          }
         },
       }
     }

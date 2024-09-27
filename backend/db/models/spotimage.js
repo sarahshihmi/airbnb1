@@ -14,7 +14,13 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   SpotImage.init({
-    spotId: DataTypes.INTEGER,
+    spotId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'Spots',
+        key: 'id'
+      }
+    },
     url: {
       type: DataTypes.STRING,
       allowNull: false,
