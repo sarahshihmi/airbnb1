@@ -84,3 +84,5 @@ router.post(
   );
 
 module.exports = router;
+
+//changed sequelizemeta so it works on render
