@@ -12,56 +12,56 @@ module.exports = {
       {
         spotId: 1, 
         userId: 2,
-        startDate: new Date('2023-01-01'),
-        endDate: new Date('2023-01-07')
+        startDate: new Date('2025-01-01'),
+        endDate: new Date('2025-01-07')
       },
       {
         spotId: 1, 
         userId: 2,
-        startDate: new Date('2023-01-20'),
-        endDate: new Date('2023-02-01')
+        startDate: new Date('2025-01-20'),
+        endDate: new Date('2025-02-01')
       },
       {
         spotId: 1,
         userId: 3,
-        startDate: new Date('2023-03-01'),
-        endDate: new Date('2023-03-10')
+        startDate: new Date('2025-03-01'),
+        endDate: new Date('2025-03-10')
       },
       {
         spotId: 2,
         userId: 1,
-        startDate: new Date('2023-03-11'),
-        endDate: new Date('2023-03-20')
+        startDate: new Date('2025-03-11'),
+        endDate: new Date('2025-03-20')
       },
       {
         spotId: 2,
         userId: 1,
-        startDate: new Date('2023-03-21'),
-        endDate: new Date('2023-03-30')
+        startDate: new Date('2025-03-21'),
+        endDate: new Date('2025-03-30')
       },
       {
         spotId: 2,
         userId: 3,
-        startDate: new Date('2023-04-01'),
-        endDate: new Date('2023-04-10')
+        startDate: new Date('2025-04-01'),
+        endDate: new Date('2025-04-10')
       },
       {
         spotId: 3,
         userId: 1,
-        startDate: new Date('2023-04-11'),
-        endDate: new Date('2023-04-20')
+        startDate: new Date('2025-04-11'),
+        endDate: new Date('2025-04-20')
       },
       {
         spotId: 3, 
         userId: 2,
-        startDate: new Date('2023-04-21'),
-        endDate: new Date('2023-04-20')
+        startDate: new Date('2025-04-21'),
+        endDate: new Date('2025-04-20')
       },
       {
         spotId: 3, 
         userId: 1,
-        startDate: new Date('2023-05-01'),
-        endDate: new Date('2023-05-10')
+        startDate: new Date('2025-05-01'),
+        endDate: new Date('2025-05-10')
       }
     ], { validate: true })
   },

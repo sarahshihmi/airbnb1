@@ -9,6 +9,8 @@ const setTokenCookie = (res, user) => {
     // Create the token.
     const safeUser = {
       id: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
       email: user.email,
       username: user.username,
     };
@@ -46,7 +48,7 @@ const setTokenCookie = (res, user) => {
         const { id } = jwtPayload.data;
         req.user = await User.findByPk(id, {
           attributes: {
-            include: ['email', 'createdAt', 'updatedAt']
+            include: [ 'id' ,'email', 'createdAt', 'updatedAt']
           }
         });
       } catch (e) {
@@ -69,6 +71,6 @@ const requireAuth = function (req, _res, next) {
     err.errors = { message: 'Authentication required' };
     err.status = 401;
     return next(err);
-  }
+}
 
   module.exports = { setTokenCookie, restoreUser, requireAuth };

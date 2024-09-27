@@ -6,7 +6,7 @@ const { check } = require('express-validator');
 const { handleValidationErrors } = require('../../utils/validation');
 
 
-const { setTokenCookie, restoreUser } = require('../../utils/auth');
+const { setTokenCookie, restoreUser, requireAuth } = require('../../utils/auth');
 const { User } = require('../../db/models');
 
 const router = express.Router();
@@ -19,12 +19,12 @@ const validateLogin = [
     check('password')
       .exists({ checkFalsy: true })
       .withMessage('Password is required'),
-    handleValidationErrors
+    handleValidationErrors,
   ];
 
 // Restore session user
 router.get(
-    '/',
+    '/', restoreUser,
     (req, res) => {
       const { user } = req;
       if (user) {
@@ -45,11 +45,10 @@ router.get(
   
 // Log in
 router.post(
-    '/',
-    validateLogin,
+    '/', validateLogin,
     async (req, res, next) => {
       const { credential, password } = req.body;
-  
+      
       const user = await User.unscoped().findOne({
         where: {
           [Op.or]: {
@@ -69,8 +68,6 @@ router.post(
   
       const safeUser = {
         id: user.id,
-        firstName: user.firstName,
-        lastName: user.lastName,
         email: user.email,
         username: user.username,
         firstName: user.firstName,  
