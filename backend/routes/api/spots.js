@@ -61,8 +61,39 @@ const ValidateReview = [
 
 const validateQuery = [
     check('page')
-        .exists({ checkFalsy: true})
-        .isInt
+    .optional({ checkFalsy: true })
+    .isInt({ min: 1})
+    .withMessage('Page must be greater than or equal to 1'),
+  check('size')
+    .optional({ checkFalsy: true })
+    .isInt({ min: 1, max: 20})
+    .withMessage('Size must be between 1 and 20'),
+  check('minLat')
+    .optional({ checkFalsy: true })
+    .isFloat({ min: -90, max: 90})
+    .withMessage('Minimum latitude is invalid'),
+  check('maxLat')
+    .optional({ checkFalsy: true })
+    .isFloat({ min: -90, max: 90})
+    .withMessage('Maximum latitude is invalid'),
+  check('minLng')
+    .optional({ checkFalsy: true })
+    .isFloat({ min: -180, max: 180})
+    .withMessage('Minimum longitude is invalid'),
+  check('maxLng')
+    .optional({ checkFalsy: true })
+    .isFloat({ min: -180, max: 180})
+    .withMessage('Maximum longitude is invalid'),
+  check('minPrice')
+    .optional({ checkFalsy: true })
+    .isFloat({ min: 0 })
+    .withMessage('Minimum price must be greater than or equal to 0'),
+  check('maxPrice')
+    .optional({ checkFalsy: true })
+    .isFloat({ min: 0 })
+    .withMessage('Maximum price must be greater than or equal to 0'),
+
+    handleValidationErrors 
 ]
 
 
@@ -219,17 +250,42 @@ router.delete('/:spotId', restoreUser, requireAuth, async (req, res) => {
 
 
 
-router.get('/', async (req, res) => {
-    let {size,page} = parseInt(req.query)
+router.get('/', validateQuery, async (req, res) => {
+    let { page, size, minLat, maxLat, minLng, maxLng, minPrice, maxPrice } = req.query;
 
     if (!size || size > 20) size = 20;
     if(!page){page = 1}else {page=size*(page-1)};
 
 
+    let where = {};
 
+    if (minLat && maxLat) {
+      where.lat = {[Op.between]: [minLat, maxLat]};
+    } else if (minLat) {
+      where.lat = {[Op.gte]: minLat};
+    } else if (maxLat) {
+      where.lat = {[Op.lte]: maxLat};
+    };
+  
+    if (minLng && maxLng) {
+      where.lng = {[Op.between]: [minLng, maxLng]};
+    } else if (minLng) {
+      where.lng = {[Op.gte]: minLng};
+    } else if (maxLng) {
+      where.lng = {[Op.lte]: maxLng};
+    };
+  
+    if (minPrice && maxPrice) {
+      where.price = {[Op.between]: [minPrice, maxPrice]};
+    } else if (minPrice) {
+      where.price = {[Op.gte]: minPrice}
+    } else if (maxPrice) {
+      where.price = {[Op.lte]: maxPrice}
+    };
 
     const spot = await Spot.scope('addRatings', 'addPreview').findAll({
-         group: ['Spot.id'],
+        where,
+        group: ['Spot.id'],
     });
 
 
