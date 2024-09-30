@@ -1,9 +1,21 @@
 const config = require('./index');
 
+console.log(process.env.USE_LOCAL_POSTGRESS === 'true');
 module.exports = {
   development: {
     storage: config.dbFile,
-    dialect: "sqlite",
+
+    ...(process.env.USE_LOCAL_POSTGRESS === 'true' ? {
+      use_env_variable: 'DATABASE_URL',
+        dialectOptions: {
+      },
+      define: {
+          schema: process.env.SCHEMA
+      },
+    } : {
+      dialect: "sqlite",
+    }),
+    
     seederStorage: "sequelize",
     logQueryParameters: true,
     typeValidation: true
