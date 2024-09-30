@@ -7,9 +7,10 @@ const { Review, ReviewImage, User, Spot, SpotImage, Booking } = require('../../d
 
 router.use(handleValidationErrors)
 
-router.get ('current', requireAuth, async(req, res) => {
+router.get('/current', requireAuth, async (req, res) => {
+  console.log('yay')
     const userId = req.user.id
-    const bookings = await Booking.findAll ({
+    const bookings = await Booking.findAll({
         where: {
             userId,
         },
@@ -19,23 +20,18 @@ router.get ('current', requireAuth, async(req, res) => {
               attributes: {
                 exclude: ['createdAt', 'updatedAt', 'description'],
               },
-              include: [
-                {
-                  model: SpotImage,
-                  attributes: ['url'],
-                  where: {
-                    preview: true,
-                  },
-                },
-              ],
             },
           ],
     })
-    res.json(reviews)
+
+    if (!bookings || bookings.length === 0) {
+      return res.status(200).json({ message: 'No bookings found for this user.', bookings: [] });
+    }
+    return res.json({'Bookings':bookings})
 })
 
 router.put('/:bookingId', requireAuth, async(req, res) => {
-    const bookingId = req.params
+    const bookingId = req.params.bookingId
     const userId = req.user.id
     const { startDate, endDate } = req.body
     const booking = await Booking.findByPk(bookingId)
@@ -72,7 +68,7 @@ router.put('/:bookingId', requireAuth, async(req, res) => {
     });
   }
 
-  //missing the part where you can't book on top of another booking
+
 
   await booking.update(req.body);
   await booking.save();
@@ -82,7 +78,7 @@ router.put('/:bookingId', requireAuth, async(req, res) => {
 
 
 router.delete('/:bookingId', requireAuth, async(req, res)=> {
-    const bookingId = req.params
+    const bookingId = req.params.bookingId
     const userId = req.user.id
     const booking = await Booking.findByPk(bookingId)
 
@@ -94,7 +90,7 @@ router.delete('/:bookingId', requireAuth, async(req, res)=> {
 
     if (!booking) {
         return res.status(404).json({
-            message: "Booing couldn't be found"
+            message: "Booking couldn't be found"
         })
     }
 
