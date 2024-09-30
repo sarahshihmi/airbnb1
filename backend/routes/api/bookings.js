@@ -4,6 +4,7 @@ const { requireAuth } = require('../../utils/auth');
 const { handleValidationErrors } = require('../../utils/validation');
 
 const { Review, ReviewImage, User, Spot, SpotImage, Booking } = require('../../db/models');
+const { Op } = require('sequelize');
 
 router.use(handleValidationErrors)
 
@@ -49,32 +50,76 @@ router.put('/:bookingId', requireAuth, async(req, res) => {
     });
   }
 
-  const currentDate = new Date();
-  if (new Date(booking.startDate) < currentDate) {
-    return res.status(400).json({
-      message: "Past bookings can't be modified",
+  const newStartDate = new Date(startDate);
+  const newEndDate = new Date(endDate);
+
+  const overlappingBookings = await Booking.findAll({
+    where: {
+      spotId: booking.spotId,
+      id: { [Op.ne]: bookingId },
+      [Op.or]: [
+        {
+          startDate: {
+            [Op.between]: [newStartDate, newEndDate]
+          }
+        },
+        {
+          endDate: {
+            [Op.between]: [newStartDate, newEndDate]
+          }
+        },
+        {
+          [Op.and]: [
+            {
+              startDate: {
+                [Op.lte]: newStartDate
+              }
+            },
+            {
+              endDate: {
+                [Op.gte]: newEndDate
+              }
+            }
+          ]
+        }
+      ]
+    }
+  });
+
+  if (overlappingBookings.length > 0) {
+    return res.status(403).json({
+      message: 'Sorry, this spot is already booked for the specified dates',
+      errors: {
+        startDate: 'Date range conflicts with existing bookings',
+        endDate: 'Date range conflicts with existing bookings',
+      },
     });
   }
-
-  if (new Date(startDate) < currentDate) {
+  const currentDate = new Date();
+  if (newStartDate <= currentDate) {
     return res.status(400).json({
       message: "Booking start date cannot be in the past",
-    });
+    })
   }
 
-  if (new Date(endDate) <= new Date(startDate)) {
+  if (newEndDate <= newStartDate) {
     return res.status(400).json({
       message: "End date must be after the start date",
     });
   }
 
+  if (new Date(booking.startDate) <= currentDate) {
+    return res.status(400).json({
+      message: "Past bookings can't be modified",
+    });
+  }
 
-
-  await booking.update(req.body);
+  booking.startDate = newStartDate;
+  booking.endDate = newEndDate;
   await booking.save();
 
   res.json(booking);
-})
+});
 
 
 router.delete('/:bookingId', requireAuth, async(req, res)=> {
@@ -82,20 +127,21 @@ router.delete('/:bookingId', requireAuth, async(req, res)=> {
     const userId = req.user.id
     const booking = await Booking.findByPk(bookingId)
 
+    if (!booking) {
+      return res.status(404).json({
+          message: "Booking couldn't be found"
+      })
+  }
     if (booking.userId !== userId) {
         return res.status(403).json({
             message: 'Forbidden'
         })
     }
 
-    if (!booking) {
-        return res.status(404).json({
-            message: "Booking couldn't be found"
-        })
-    }
+
 
     const currentDate = new Date()
-    if (new Date(booking.startDate) < currentDate) {
+    if (new Date(booking.startDate) <= currentDate) {
         return res.status(403).json({
           message: "Past bookings can't be deleted",
         });
