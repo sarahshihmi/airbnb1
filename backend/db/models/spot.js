@@ -222,9 +222,10 @@ module.exports = (sequelize, DataTypes) => {
           attributes: {
             include: [
               [Sequelize.literal(`(SELECT "url"
-                        FROM SpotImages AS image
+                        FROM "SpotImages" AS image
                         WHERE
-                            image.preview = true)`),
+                            image.preview = true
+                        LIMIT 1)`),
                             'previewImage',
               ],
             ]
